@@ -19,7 +19,7 @@ test('iletişim formu headerı render ediliyor', () => {
 test('kullanıcı adını 5 karakterden az girdiğinde BİR hata mesajı render ediyor.', async () => {
     render(<IletisimFormu/>);
     const name = screen.getByLabelText("Ad*");
-    fireEvent.change(name, { target: { value: "lore" } });
+    fireEvent.change(name, { target: { value: "Eda" } });
     const error = screen.getByTestId("error");
     expect(error).toHaveTextContent("Hata: ad en az 5 karakter olmalıdır.");
 });
@@ -35,10 +35,30 @@ test('kullanıcı inputları doldurmadığında ÜÇ hata mesajı render ediliyo
 });
 
 test('kullanıcı doğru ad ve soyad girdiğinde ama email girmediğinde BİR hata mesajı render ediliyor.', async () => {
+    render(<IletisimFormu/>)
+    const name = screen.getByLabelText("Ad*");
+    fireEvent.change(name, { target: { value: "Edaki" } });
+
+    const surname = screen.getByPlaceholderText("Mansız");
+    fireEvent.change(surname, { target: { value: "Kalayci" } });
+
+    const submitBtn = screen.getByText("Gönder");
+    fireEvent.click(submitBtn);
+
+    const error = screen.getByTestId("error");
+    expect(error).toHaveTextContent(
+      "Hata: email geçerli bir email adresi olmalıdır."
+    );
+
 
 });
 
 test('geçersiz bir mail girildiğinde "email geçerli bir email adresi olmalıdır." hata mesajı render ediliyor', async () => {
+    render(<IletisimFormu/>);
+    const mail = screen.getByLabelText("Email*")
+    fireEvent.change(mail, {target: {value: "eda"}})
+    const error = screen.getByTestId("error")
+    expect(error).toHaveTextContent("Hata: email geçerli bir email adresi olmalıdır.")
 
 });
 
