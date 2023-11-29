@@ -6,9 +6,13 @@ import IletisimFormu from './IletisimFormu';
 
 test('hata olmadan render ediliyor', () => {
 
+    render(<IletisimFormu/>)
 });
 
 test('iletişim formu headerı render ediliyor', () => {
+    render(<IletisimFormu/>)
+    const header = screen.getByText("İletişim Formu");
+    expect(header).toBeInTheDocument();
 
 });
 
