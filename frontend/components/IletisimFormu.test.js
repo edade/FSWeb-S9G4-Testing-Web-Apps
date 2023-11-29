@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor,fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import userEvent from '@testing-library/user-event';
 import IletisimFormu from './IletisimFormu';
@@ -17,10 +17,20 @@ test('iletişim formu headerı render ediliyor', () => {
 });
 
 test('kullanıcı adını 5 karakterden az girdiğinde BİR hata mesajı render ediyor.', async () => {
-
+    render(<IletisimFormu/>);
+    const name = screen.getByLabelText("Ad*");
+    fireEvent.change(name, { target: { value: "lore" } });
+    const error = screen.getByTestId("error");
+    expect(error).toHaveTextContent("Hata: ad en az 5 karakter olmalıdır.");
 });
 
 test('kullanıcı inputları doldurmadığında ÜÇ hata mesajı render ediliyor.', async () => {
+    render(<IletisimFormu/>);
+    const submitBtn = screen.getByRole("button", { name: "Gönder" });
+    expect(submitBtn).toHaveTextContent("Gönder");
+    fireEvent.click(submitBtn);
+    const errors = screen.getAllByTestId("error");
+    expect(errors).toHaveLength(3);
 
 });
 
