@@ -4,6 +4,13 @@ import '@testing-library/jest-dom/extend-expect';
 import userEvent from '@testing-library/user-event';
 import IletisimFormu from './IletisimFormu';
 
+/* 
+her seferinde render yazmamak için başa ekleyebiliriz
+beforeEach(() => {
+  render(<IletisimFormu />);
+});
+*/
+
 test('hata olmadan render ediliyor', () => {
 
     render(<IletisimFormu/>)
@@ -63,13 +70,71 @@ test('geçersiz bir mail girildiğinde "email geçerli bir email adresi olmalıd
 });
 
 test('soyad girilmeden gönderilirse "soyad gereklidir." mesajı render ediliyor', async () => {
+    render(<IletisimFormu/>)
+
+    const name = screen.getByLabelText("Ad*")
+    userEvent.type(name, "Edaki")
+
+    const mail = screen.getByLabelText("Email*")
+    fireEvent.change(mail, {target: {value: "edakalaycioglu@mail.com"}})
+
+    const submitBtn = screen.getByText("Gönder");
+    fireEvent.click(submitBtn);
+
+    const error = screen.queryAllByTestId("error");
+    expect(error[0]).toHaveTextContent("Hata: soyad gereklidir.")
+
 
 });
 
 test('ad,soyad, email render ediliyor. mesaj bölümü doldurulmadığında hata mesajı render edilmiyor.', async () => {
+    render(<IletisimFormu/>)
+    const name = screen.getByLabelText("Ad*")
+    fireEvent.change(name, { target: { value: "Edaki" } });
+  
+    const surname = screen.getByLabelText("Soyad*");
+    fireEvent.change(surname, { target: { value: "Kalayci" } });
+  
+    const email = screen.getByLabelText("Email*");
+    fireEvent.change(email, { target: { value: "edakalaycioglu@mail.com" } });
+  
+    await waitFor(() => {
+      const errors = screen.queryAllByTestId("error");
+      console.log(errors);
+      expect(errors).toHaveLength(0);
+    });
 
 });
 
 test('form gönderildiğinde girilen tüm değerler render ediliyor.', async () => {
+    render(<IletisimFormu/>)
+    const name = screen.getByLabelText("Ad*")
+    fireEvent.change(name, { target: { value: "Edaki" } });
+  
+    const surname = screen.getByLabelText("Soyad*");
+    fireEvent.change(surname, { target: { value: "Kalayci" } });
+  
+    const mail = screen.getByLabelText("Email*");
+    fireEvent.change(mail, { target: { value: "edakalaycioglu@mail.com" } });
+  
+    const mesaj = screen.getByLabelText("Mesaj");
+    fireEvent.change(mesaj, { target: { value: "Mesaj" } });
+  
+    // formu gönder
+    fireEvent(screen.getByText("Gönder"), new MouseEvent("click"));
+  
+    // Render edilen değerleri ara
+    await waitFor(() => {
+      const ad = screen.getByTestId("firstnameDisplay");
+      const soyad = screen.getByTestId("lastnameDisplay");
+      const email = screen.getByTestId("emailDisplay");
+      const mesaj = screen.getByTestId("messageDisplay");
+  
+      expect(ad).toHaveTextContent("Edaki");
+      expect(soyad).toHaveTextContent("Kalayci");
+      expect(email).toHaveTextContent("edakalaycioglu@mail.com");
+      expect(mesaj).toHaveTextContent("Mesaj");
+    });
+
 
 });
